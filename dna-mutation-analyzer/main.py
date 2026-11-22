@@ -1,3 +1,9 @@
+# This project finds the type of mutation present when
+# given two strings of DNA sequences to compare. It also 
+# tells the user the codon and amino acid change as a 
+# result of this mutation.
+
+# dictionary of all codons to amino acids
 dnadict = {
     "ATG": "M",
     "TAA": "stop", "TAG": "stop", "TGA": "stop",
@@ -22,6 +28,10 @@ dnadict = {
     "TAT": "Y", "TAC": "Y"
 }
 
+# function that compares the two DNA sequences and returns 
+# where the mutation occured on 1-based index, mutation info 
+# (which stores mutation position, original nucleotide, and 
+# mutated nucleotide), and number of mutations
 def comp(reference, sample):
     mutation = []
     number = 0
@@ -33,13 +43,17 @@ def comp(reference, sample):
             number+=1
     return mutation, mutationinfo, number
 
+# function returns codon with a given nucleotide position
 def find_codon(sequence, position):
     start = ((position - 1) //3) * 3
     return sequence[start:start + 3]
 
+# gets and saves user entered reference DNA sequence 
+# and sample DNA sequence
 ref = input("\nEnter reference DNA sequence: ").upper()
 samp = input("Enter sample DNA sequence: ").upper()
 
+# sees if both sequence inputs are valid sequences
 valid = True
 if len(ref) != len(samp) or len(ref) % 3 != 0:
     valid = False
@@ -56,26 +70,33 @@ if valid == False:
 else:
     mutations, info, number = comp(ref, samp)
 
+    # displays mutation positions and number of mutations
     if number != 0:
         print("Mutation positions: ", mutations)
         print("Number of mutations: ", number, "\n")
 
+        #records positions for all mutations and saves them in list
         position_record = []
         for position, original, changed in info:
             position_record.append(position)
 
-        
+        # groups mutations within the same codon to avoid over-analysis
+        # of codon more than once
         for position, original, changed in info:
             if position != position_record[0]:
                 if (position - 1) // 3 == (position_record[position_record.index(position) - 1] - 1) // 3:
                     continue
+            
+            # displays all nucleotides changed within one codon
             for item in range(len(position_record)):
                 if (position_record[item] - 1) // 3 == (position - 1) // 3:
                     print("Change in nucleotide position", position_record[item], ":", ref[position_record[item] - 1], "->", samp[position_record[item] - 1])
 
+            # stores original and mutated codons
             y = find_codon(samp, position)
             x = find_codon(ref, position)
-            
+
+            # identifies type of mutation based on type of amino acid change
             if y in ["TAA", "TAG", "TGA"] and x not in ["TAA", "TAG", "TGA"]:
                 print("Nonsense. Stop codon introduced.")
                 print("Codon: ", x, "->", y)

@@ -1,3 +1,7 @@
+# This project translates DNA sequence to an amino acid sequence, 
+# using start and stop codons to determine where to start and 
+# stop respectively.
+
 dnadict = {
     "ATG": "M",
     "TAA": "stop", "TAG": "stop", "TGA": "stop",
@@ -22,16 +26,23 @@ dnadict = {
     "TAT": "Y", "TAC": "Y"
 }
 
+# function that returns position of starting point based on 
+# where start codon is (0-base)
 def find_start(sequence):
-    for i in range(len(sequence) - len(sequence)-2):
+    for i in range(len(sequence)-2):
         if sequence[i:i+3] == "ATG":
             return i
 
+# function that returns position of ending point based on 
+# where stop codon is (0-base)
 def find_end(sequence, startposition):
-    for x in range(startposition, len(sequence) - len(sequence)-2, 3):
+    for x in range(startposition, len(sequence)-2, 3):
         if sequence[x:x+3] in ["TAA", "TAG", "TGA"]:
             return x
 
+# function that returns string of amino acid sequence from 
+# start codon to stop codon, returning errors if sequence 
+# cannot be analyzed due to lack of start codon or stop codon.
 def translate_dna(sequence):
     amino_seq = ""
     start = find_start(sequence)
@@ -49,8 +60,12 @@ def translate_dna(sequence):
     else:
         return "Error. Sequence cannot be analyzed."
 
+# stores user input of DNA sequence
 seq = input("Enter DNA Sequence: ").upper()
 
+# validates if sequence can be analyzed and either executes 
+# translate_dna function if it is valid or otherwise returns 
+# an error message
 valid = True
 for letter in seq:
     if letter not in "AGTC":
